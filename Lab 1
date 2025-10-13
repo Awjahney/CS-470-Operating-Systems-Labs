@@ -1,0 +1,26 @@
+# Main directory with the current date and time as its name.
+main_dir=$(date +"%Y-%m-%d_%H-%M-%S")
+
+# Creates a main directory
+mkdir "$main_dir"
+
+# Defined an array of programming languages
+ProgramLang=("Java" "C" "C++" "Python" "JavaScript" "PHP" "HTML" "CSS" "SQL")
+
+# Generates ten subdirectories within the main directory, named file101 to file1$
+for i in {101..110}; do
+    sub_dir="$main_dir/file$i"
+    mkdir "$sub_dir"
+
+    # In each subdirectory, creates ten .txt files named tuser501.txt to tuser51$
+    for j in {501..510}; do
+        file_name="$sub_dir/tuser$j.txt"
+
+        # Writes a unique programming language name (e.g. “Python”) into each .t$
+        pLang=${ProgramLang[$((RANDOM % ${#ProgramLang[@]}))]}
+        echo "$pLang" > "$file_name"
+    done
+done
+
+# Completion message
+echo "All directories and files created successfully in: $main_dir"
