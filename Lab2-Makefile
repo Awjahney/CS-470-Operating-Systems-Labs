@@ -1,0 +1,36 @@
+# Makefile to compile CS 470 Lab2 C program.
+
+# Instructions for how to run in terminal:
+# 1. Navigate to Your Project Directory
+# 2. In the terminal type the following, then push enter: make
+# 3. Then in the terminal type the following, then push enter: ./Lab2
+
+# Compiler
+CC = gcc
+
+# Compiler flags
+CFLAGS = -Wall -std=c99
+
+# Target executable name
+TARGET = Lab2
+
+# Source file
+SRCS = Lab2.c
+
+# Object files (automatically derived from the source files)
+OBJS = $(SRCS:.c=.o)
+
+# Default target (build the executable)
+all: $(TARGET)
+
+# Rule to create the target executable
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+
+# Rule to compile .c files into .o files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean up build files (object files and executable)
+clean:
+	rm -f $(TARGET) $(OBJS)
