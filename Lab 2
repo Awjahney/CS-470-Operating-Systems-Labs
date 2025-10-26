@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#define NUM_CHILDREN 10
+
+// The function to execute a command in a child process
+void execute_command(char *command, char *args[]) {
+    execvp(command, args);
+    // If execvp returns then there was an error
+    perror("execvp failed");
+    exit(EXIT_FAILURE);
+}
+
+int main() {
+    pid_t pid;
+    int status;
+
+    // Main process (parent) creates 10 child processes.
+    for (int i = 0; i < NUM_CHILDREN; i++) {
+        pid = fork();  // Create a new child process
+
+        if (pid == -1) {
+            // Handle fork failure
+            perror("fork failed");
+            exit(EXIT_FAILURE);
+        }
+
+        if (pid == 0) {
+            // Inside the child process
+            char *command;
+            char *args[3];
+
+            switch (i) {
+                case 0:
+                    // One process should be “echo "Hello + <Your Name>" ”
+                    command = "echo";
+                    args[0] = "echo";
+                    args[1] = "Hello, <Your Name>";  // Replace <Your Name> with your actual name
+                    args[2] = NULL;
+                    break;
+                case 1:
+                    // Child 1: Run "ls"
+                    command = "ls";
+                    args[0] = "ls";
+                    args[1] = NULL;
+                    break;
+                case 2:
+                    // Child 2: Run "pwd"
+                    command = "pwd";
+                    args[0] = "pwd";
+                    args[1] = NULL;
+                    break;
+                default:
+                    // For other children, run a simple "date"
+                    command = "date";
+                    args[0] = "date";
+                    args[1] = NULL;
+                    break;
+            }
+            execute_command(command, args);
+        }
+    }
+
+    // After creating child processes, the parent process should use wait() or waitpid().
+    for (int i = 0; i < NUM_CHILDREN; i++) {
+        pid = wait(&status);  // Wait for a child processes to complete.
+
+        if (pid == -1) {
+            perror("wait failed");
+            exit(EXIT_FAILURE);
+        }
+
+        // Report whether the child exited normally or was terminated by a signal.
+        // Display the exit status or signal number as appropriate.
+        if (WIFEXITED(status)) {
+            printf("Child with PID %d exited normally with status %d\n", pid, WEXITSTATUS(status));
+        } else if (WIFSIGNALED(status)) {
+            printf("Child with PID %d was terminated by signal %d\n", pid, WTERMSIG(status));
+        } else {
+            printf("Child with PID %d terminated abnormally\n", pid);
+        }
+    }
+
+    printf("Parent process has completed.\n");
+
+    return 0;
+}
